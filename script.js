@@ -1,9 +1,5 @@
 'use strict';
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// BANKIST APP
-
 // Data
 const account1 = {
   owner: 'Jonas Schmedtmann',
@@ -63,36 +59,56 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 
 const displayMovements = function (movements) {
-  movements.forEach((mov, i) => {
-    const type = mov > 0 ? 'deposit' : 'withdrawal'
+  containerMovements.innerHTML = ''
 
-
-    const html = `        
-    <div class="movements__row">
-      <div class="movements__type movements__type--${type}">
-       ${i + 1}
-      </div>
-      <div class="movements__value">${mov}</div>
-    </div>
-  `
-    console.log(html);
+  const movementsToInsert = movements.map((mov, i) => {
+    return `        
+        <div class="movements__row">
+          <div class="movements__type movements__type--${mov > 0 ? 'deposit' : 'withdrawal'}">
+          ${i + 1} ${mov > 0 ? 'deposit' : 'withdrawal'}
+          </div>
+          <div class="movements__value">${mov}</div>
+        </div>
+      `;
   })
+  movementsToInsert.reverse()
+  containerMovements.insertAdjacentHTML('afterbegin', movementsToInsert)
 
 
 }
 
 displayMovements(account1.movements)
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+const createUsernames = function (accs) {
+  accs.forEach((acc) => {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('')
+  })
+}
+createUsernames(accounts);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// const movements = [25, -150, 252, 66, -1]
+// const deposits = movements.filter(mov => mov > 0)
 
-/////////////////////////////////////////////////
+// const withrawals = movements.filter(mov => mov < 0)
+
+
+const calcPrintBalance = function (movements) {
+  const balance = movements.reduce((acc, mov, i) => {
+    return acc + mov
+  }, 0)
+  labelBalance.innerHTML = balance + "$"
+}
+
+calcPrintBalance(account1.movements)
+
+console.log(account1.movements);
+const max = account1.movements.reduce((acc, mov) => {
+  console.log(`${acc}`);
+  return acc < mov ? mov : acc
+}, account1.movements[0])
+console.log(max);
