@@ -49,13 +49,13 @@ const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
 const btnSort = document.querySelector('.btn--sort');
 
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
+let inputLoginUsername = document.querySelector('.login__input--user');
+let inputLoginPin = document.querySelector('.login__input--pin');
 const inputTransferTo = document.querySelector('.form__input--to');
 const inputTransferAmount = document.querySelector('.form__input--amount');
 const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
+let inputCloseUsername = document.querySelector('.form__input--user');
+let inputClosePin = document.querySelector('.form__input--pin');
 
 
 const displayMovements = function (movements) {
@@ -67,7 +67,7 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${mov > 0 ? 'deposit' : 'withdrawal'}">
           ${i + 1} ${mov > 0 ? 'deposit' : 'withdrawal'}
           </div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${mov}$</div>
         </div>
       `;
   })
@@ -88,6 +88,7 @@ const createUsernames = function (accs) {
       .map(name => name[0])
       .join('')
   })
+
 }
 createUsernames(accounts);
 
@@ -97,34 +98,64 @@ createUsernames(accounts);
 // const withrawals = movements.filter(mov => mov < 0)
 
 
-const calcPrintBalance = function (movements) {
-  const balance = movements.reduce((acc, mov, i) => {
+const calcPrintBalance = function (account) {
+  const balance = account.movements.reduce((acc, mov, i) => {
     return acc + mov
   }, 0)
   labelBalance.innerHTML = balance + "$"
 }
 
-calcPrintBalance(account1.movements)
 
 
-const calcPrintSummary = function (movements) {
-  const incomes = movements.filter(mov => mov > 0).reduce((acc, cur) => acc + cur)
+
+const calcPrintSummary = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, cur) => acc + cur)
   labelSumIn.textContent = `${incomes}$`;
 
-  const withdrawals = movements.filter(mov => mov < 0).reduce((acc, cur) => acc + cur)
+  const withdrawals = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, cur) => acc + cur)
   labelSumOut.textContent = `${withdrawals}$`.slice(1);
 
-  const interest = movements.filter(mov => mov > 0).map(deposit => deposit * 1.2 / 100).filter(deposit => deposit > 1).reduce((acc, cur) => acc + cur)
+  const interest = acc.movements.filter(mov => mov > 0)
+    .map(deposit => deposit * acc.interestRate / 100)
+    .filter(deposit => deposit > 1)
+    .reduce((acc, cur) => acc + cur)
   labelSumInterest.textContent = `${interest}$`;
-  console.log(interest);
+
 }
 
-console.log(account1.movements);
-calcPrintSummary(account1.movements)
 
 
 
 
+
+const findAccount = function (login, pin) {
+  console.log('login:', login);
+  console.log('pin:', pin);
+
+  const user = accounts.find(acc => acc.username === login)
+  const isCorrectPIN = accounts.find(acc => acc.pin === pin)
+  console.log(user);
+  if (user && isCorrectPIN) {
+    inputLoginUsername.value = inputLoginPin.value = '';
+    labelWelcome.textContent = `Welcome back, ${user.owner.split(' ')[0]}!`;
+    containerApp.style.opacity = 1;
+    calcPrintSummary(user)
+    calcPrintBalance(user)
+  }
+  else console.log(`nope, you didn't make it!`);
+
+}
+
+
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault()
+  findAccount(inputLoginUsername.value, Number(inputLoginPin.value))
+})
 
 // console.log('account 1 movements:', account1.movements)
 // let toEUR = 1.1
