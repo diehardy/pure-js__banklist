@@ -106,9 +106,33 @@ const calcPrintBalance = function (movements) {
 
 calcPrintBalance(account1.movements)
 
+
+const calcPrintSummary = function (movements) {
+  const incomes = movements.filter(mov => mov > 0).reduce((acc, cur) => acc + cur)
+  labelSumIn.textContent = `${incomes}$`;
+
+  const withdrawals = movements.filter(mov => mov < 0).reduce((acc, cur) => acc + cur)
+  labelSumOut.textContent = `${withdrawals}$`.slice(1);
+
+  const interest = movements.filter(mov => mov > 0).map(deposit => deposit * 1.2 / 100).filter(deposit => deposit > 1).reduce((acc, cur) => acc + cur)
+  labelSumInterest.textContent = `${interest}$`;
+  console.log(interest);
+}
+
 console.log(account1.movements);
-const max = account1.movements.reduce((acc, mov) => {
-  console.log(`${acc}`);
-  return acc < mov ? mov : acc
-}, account1.movements[0])
-console.log(max);
+calcPrintSummary(account1.movements)
+
+
+
+
+
+// console.log('account 1 movements:', account1.movements)
+// let toEUR = 1.1
+// const depositsEUR = account1.movements
+//   .filter((mov) => mov > 0)
+//   .map(mov => mov * toEUR)
+//   .reduce((acc, cur, i, arr) => acc + cur)
+
+
+
+// console.log('Deposits EUROS:', depositsEUR);
