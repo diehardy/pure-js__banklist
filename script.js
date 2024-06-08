@@ -98,10 +98,10 @@ createUsernames(accounts);
 
 
 const calcPrintBalance = function (account) {
-  const balance = account.movements.reduce((acc, mov, i) => {
+  account.balance = account.movements.reduce((acc, mov, i) => {
     return acc + mov
   }, 0)
-  labelBalance.innerHTML = balance + "$"
+  labelBalance.innerHTML = account.balance + "$"
 }
 
 
@@ -148,9 +148,7 @@ const findAccount = function (login, pin) {
 
 
 
-    calcPrintSummary(authorizedAccount)
-    calcPrintBalance(authorizedAccount)
-    displayMovements(authorizedAccount.movements)
+    updateUI()
 
   }
   else console.log(`nope, you didn't make it!`);
@@ -168,28 +166,31 @@ btnLogin.addEventListener('click', function (e) {
 
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault()
-
-  let accountTo = accounts.filter(acc => acc.username === inputTransferTo.value)
-  if (accountTo[0]) {
-    authorizedAccount.movements.push(Number(-inputTransferAmount.value))
-    accountTo[0].movements.push(Number(inputTransferAmount.value))
-
+  let transferMoney = Number(inputTransferAmount.value)
+  let accountTo = accounts.find(acc => acc.username === inputTransferTo.value)
+  if (accountTo && authorizedAccount.balance >= transferMoney && transferMoney > 0 && accountTo !== authorizedAccount) {
+    authorizedAccount.movements.push(-transferMoney)
+    accountTo.movements.push(transferMoney)
+    transferMoney = 0
     accountTo = '';
     inputTransferAmount.value = '';
     inputTransferTo.value = '';
+    alert('you sent money successfully!')
   }
   else {
-    alert('we didn`t found any recipients with this login')
+    alert('something went wrong!')
   }
-  calcPrintSummary(authorizedAccount)
-  calcPrintBalance(authorizedAccount)
-  displayMovements(authorizedAccount.movements)
+  updateUI()
 
 })
 
 
 
-
+const updateUI = function () {
+  calcPrintSummary(authorizedAccount)
+  calcPrintBalance(authorizedAccount)
+  displayMovements(authorizedAccount.movements)
+}
 
 
 
