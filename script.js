@@ -77,7 +77,6 @@ const displayMovements = function (movements) {
 
 }
 
-displayMovements(account1.movements)
 
 
 const createUsernames = function (accs) {
@@ -129,7 +128,7 @@ const calcPrintSummary = function (acc) {
 
 
 
-
+let authorizedAccount = ''
 
 
 const findAccount = function (login, pin) {
@@ -140,11 +139,19 @@ const findAccount = function (login, pin) {
   const isCorrectPIN = accounts.find(acc => acc.pin === pin)
   console.log(user);
   if (user && isCorrectPIN) {
+
+    authorizedAccount = user
     inputLoginUsername.value = inputLoginPin.value = '';
-    labelWelcome.textContent = `Welcome back, ${user.owner.split(' ')[0]}!`;
+    labelWelcome.textContent = `Welcome back, ${authorizedAccount.owner.split(' ')[0]}!`;
     containerApp.style.opacity = 1;
-    calcPrintSummary(user)
-    calcPrintBalance(user)
+
+
+
+
+    calcPrintSummary(authorizedAccount)
+    calcPrintBalance(authorizedAccount)
+    displayMovements(authorizedAccount.movements)
+
   }
   else console.log(`nope, you didn't make it!`);
 
@@ -156,6 +163,35 @@ btnLogin.addEventListener('click', function (e) {
   e.preventDefault()
   findAccount(inputLoginUsername.value, Number(inputLoginPin.value))
 })
+
+
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault()
+
+  let accountTo = accounts.filter(acc => acc.username === inputTransferTo.value)
+  if (accountTo[0]) {
+    authorizedAccount.movements.push(Number(-inputTransferAmount.value))
+    accountTo[0].movements.push(Number(inputTransferAmount.value))
+
+    accountTo = '';
+    inputTransferAmount.value = '';
+    inputTransferTo.value = '';
+  }
+  else {
+    alert('we didn`t found any recipients with this login')
+  }
+  calcPrintSummary(authorizedAccount)
+  calcPrintBalance(authorizedAccount)
+  displayMovements(authorizedAccount.movements)
+
+})
+
+
+
+
+
+
 
 // console.log('account 1 movements:', account1.movements)
 // let toEUR = 1.1
