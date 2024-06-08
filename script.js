@@ -193,7 +193,23 @@ const updateUI = function () {
 }
 
 
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault()
 
+  const userLoginToDelete = inputCloseUsername.value;
+  const userPinToDelete = Number(inputClosePin.value);
+
+  const indexToDelete = accounts.findIndex((el) => el.username === userLoginToDelete)
+
+  if (
+    accounts[indexToDelete] === authorizedAccount && userPinToDelete === accounts[indexToDelete].pin
+  ) { accounts.splice(indexToDelete, 1) }
+
+
+  containerApp.style.opacity = 0
+  inputCloseUsername.value = ''
+  inputClosePin.value = ''
+})
 // console.log('account 1 movements:', account1.movements)
 // let toEUR = 1.1
 // const depositsEUR = account1.movements
