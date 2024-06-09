@@ -61,12 +61,10 @@ let isSorted = false
 
 const displayMovements = function (movements, sort = false) {
   containerMovements.innerHTML = ''
-  if (sort && !isSorted) {
+  if (sort) {
     isSorted = true
     movements = [...movements].sort((a, b) => a - b)
-  } else {
-    isSorted = false
-  }
+  } else isSorted = false
   const movementsToInsert = movements.map((mov, i) => {
     return `        
         <div class="movements__row">
@@ -236,7 +234,7 @@ btnSort.addEventListener('click', function (e) {
   e.preventDefault()
 
 
-  displayMovements(authorizedAccount.movements, true)
+  displayMovements(authorizedAccount.movements, !isSorted)
 
 
 
