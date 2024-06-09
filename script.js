@@ -57,10 +57,16 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 let inputCloseUsername = document.querySelector('.form__input--user');
 let inputClosePin = document.querySelector('.form__input--pin');
 
+let isSorted = false
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   containerMovements.innerHTML = ''
-
+  if (sort && !isSorted) {
+    isSorted = true
+    movements = [...movements].sort((a, b) => a - b)
+  } else {
+    isSorted = false
+  }
   const movementsToInsert = movements.map((mov, i) => {
     return `        
         <div class="movements__row">
@@ -207,16 +213,33 @@ btnClose.addEventListener('click', function (e) {
 
 
   containerApp.style.opacity = 0
-  inputCloseUsername.value = ''
-  inputClosePin.value = ''
+  inputCloseUsername.value = inputClosePin.value = ''
 })
-// console.log('account 1 movements:', account1.movements)
-// let toEUR = 1.1
-// const depositsEUR = account1.movements
-//   .filter((mov) => mov > 0)
-//   .map(mov => mov * toEUR)
-//   .reduce((acc, cur, i, arr) => acc + cur)
 
 
 
-// console.log('Deposits EUROS:', depositsEUR);
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault()
+
+  const amount = Number(inputLoanAmount.value);
+
+  if (amount > 0 && authorizedAccount.movements.some(mov => mov >= amount * 0.1)) {
+    authorizedAccount.movements.push(amount)
+  }
+  updateUI()
+})
+
+
+let flag = 0
+
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault()
+
+
+  displayMovements(authorizedAccount.movements, true)
+
+
+
+
+})
+
