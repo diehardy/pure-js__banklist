@@ -7,14 +7,14 @@ const account1 = {
   interestRate: 1.2, // %
   pin: 1111,
   movementsDates: [
-    '2019-11-01T13:15:33.035Z',
-    '2019-11-30T09:48:16.867Z',
-    '2019-12-25T06:04:23.907Z',
-    '2020-01-25T14:18:46.235Z',
-    '2020-02-05T16:33:06.386Z',
-    '2020-04-10T14:43:26.374Z',
-    '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-09T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-11T12:01:20.894Z',
+    '2024-06-12T12:01:20.894Z',
   ],
 };
 
@@ -106,12 +106,20 @@ const displayMovements = function (acc, sort = false) {
     acc.movements = [...acc.movements].sort((a, b) => a - b)
   } else isSorted = false
   const movementsToInsert = acc.movements.map((mov, i) => {
+    let dateToDisplay = ''
+    if (7 < Math.abs(new Date(calcDaysPassed(new Date(), new Date(acc.movementsDates[i]))))) {
+      dateToDisplay = new Date(acc.movementsDates[i]).toLocaleDateString()
+    } else if (Math.abs(new Date(calcDaysPassed(new Date(), new Date(acc.movementsDates[i])))) === 0) { dateToDisplay = 'today' }
+    else {
+      dateToDisplay = Math.abs(new Date(calcDaysPassed(new Date(), new Date(acc.movementsDates[i])))) + ' days ago';
+    }
+
     return `        
         <div class="movements__row">
           <div class="movements__type movements__type--${mov > 0 ? 'deposit' : 'withdrawal'}">
           ${i + 1} ${mov > 0 ? 'deposit' : 'withdrawal'}
           </div>
-          <div class="movements__date">${new Date(acc.movementsDates[i]).toLocaleDateString()}</div>
+          <div class="movements__date">${dateToDisplay}</div>
           <div class="movements__value">${mov}$</div>
         </div>
       `;
@@ -283,3 +291,15 @@ btnSort.addEventListener('click', function (e) {
 
 labelDate.textContent = new Date().toLocaleDateString()
 
+
+
+
+let date1 = new Date()
+let date2 = new Date('2019-11-01T13:15:33.035Z')
+
+
+
+const calcDaysPassed = (date1, date2) => (date2 - date1) / (1000 * 60 * 60 * 24)
+
+
+console.log(Math.abs(new Date(calcDaysPassed(date2, date1))));
