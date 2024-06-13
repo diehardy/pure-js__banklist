@@ -98,7 +98,7 @@ let inputCloseUsername = document.querySelector('.form__input--user');
 let inputClosePin = document.querySelector('.form__input--pin');
 
 let isSorted = false
-
+let timer = ''
 const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = ''
   if (sort) {
@@ -190,18 +190,19 @@ const findAccount = function (login, pin) {
 
   const user = accounts.find(acc => acc.username === login)
   const isCorrectPIN = accounts.find(acc => acc.pin === pin)
-  console.log(user);
+  //console.log(user);
   if (user && isCorrectPIN) {
+
 
     authorizedAccount = user
     inputLoginUsername.value = inputLoginPin.value = '';
     labelWelcome.textContent = `Welcome back, ${authorizedAccount.owner.split(' ')[0]}!`;
     containerApp.style.opacity = 1;
+    updateTimer()
 
 
 
 
-    updateUI(authorizedAccount)
 
   }
   else console.log(`nope, you didn't make it!`);
@@ -230,12 +231,14 @@ btnTransfer.addEventListener('click', function (e) {
     accountTo = '';
     inputTransferAmount.value = '';
     inputTransferTo.value = '';
+    updateTimer()
     alert('you sent money successfully!')
+
   }
   else {
+    updateTimer()
     alert('something went wrong!')
   }
-  updateUI(authorizedAccount)
 
 })
 
@@ -269,15 +272,18 @@ btnClose.addEventListener('click', function (e) {
 
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault()
-
+  updateTimer()
   const amount = Number(inputLoanAmount.value);
 
   if (amount > 0 && authorizedAccount.movements.some(mov => mov >= amount * 0.1)) {
-    authorizedAccount.movements.push(amount)
-    authorizedAccount.movementsDates.push(new Date().toISOString())
-    inputLoanAmount.value = ''
+    alert('Money will arrive soon!')
+    setTimeout(() => {
+      authorizedAccount.movements.push(amount)
+      authorizedAccount.movementsDates.push(new Date().toISOString())
+      inputLoanAmount.value = ''
+    }, 200)
+
   }
-  updateUI(authorizedAccount)
 })
 
 
@@ -285,21 +291,52 @@ let flag = 0
 
 btnSort.addEventListener('click', function (e) {
   e.preventDefault()
+  updateTimer()
   displayMovements(authorizedAccount, !isSorted)
 })
 
-
-labelDate.textContent = new Date().toLocaleDateString()
-
-
-
-
-let date1 = new Date()
-let date2 = new Date('2019-11-01T13:15:33.035Z')
-
+const options = {
+  hour: 'numeric',
+  minute: 'numeric',
+  weekday: 'long'
+}
+labelDate.textContent = new Intl.DateTimeFormat('en-US', options).format(new Date())
 
 
 const calcDaysPassed = (date1, date2) => (date2 - date1) / (1000 * 60 * 60 * 24)
 
 
-console.log(Math.abs(new Date(calcDaysPassed(date2, date1))));
+
+
+
+
+const setLogOutTimer = function () {
+  let time = 300
+  const tick = () => {
+    const minutes = String(Math.trunc(time / 60)).padStart(2, 0)
+    const seconds = String(Math.trunc(time % 60)).padStart(2, 0)
+    if (time === 0) {
+      clearInterval(timer)
+      containerApp.style.opacity = 0
+      authorizedAccount = ''
+      labelWelcome.textContent = 'Log in to get started'
+    }
+    // console.log('timer is ticking');
+    if (authorizedAccount) updateUI(authorizedAccount)
+    labelTimer.textContent = minutes + ':' + seconds
+    --time;
+  }
+
+  let timer = setInterval(tick, 1000)
+  return timer
+}
+
+
+
+
+
+
+const updateTimer = function () {
+  if (timer) clearInterval(timer)
+  timer = setLogOutTimer()
+}
